@@ -1,8 +1,11 @@
 require 'sprockets'
 require 'sprockets/engines'
+require 'action_view/helpers/javascript_helper'
 
 module AngularRailsTemplates
   class Template < Tilt::Template
+    include ActionView::Helpers::JavaScriptHelper
+
     def self.default_mime_type
       'application/javascript'
     end
@@ -38,14 +41,13 @@ module AngularRailsTemplates
 
     def render_script_template(path, data)
       %Q{
-window.AngularRailsTemplates || (window.AngularRailsTemplates = angular.module(#{module_name}, []));
+window.angularTemplates || (window.angularTemplates = angular.module(#{module_name}, []));
 
-window.AngularRailsTemplates.run(["$templateCache",function($templateCache) {
-  $templateCache.put(#{path.inspect}, #{data.to_json});
-}]);
+window.angularTemplates.run(function($templateCache) {
+  $templateCache.put(#{path.inspect}, "#{escape_javascript(data)}");
+});
       }
     end
 
   end
 end
-
